@@ -41,6 +41,7 @@ const Login = ({ classes }) => {
                 clientId={process.env.REACT_APP_OAUTH_CLIENT_ID} 
                 onSuccess={onSuccess}
                 onFailure={onFailure}
+                buttonText="Login with Google"
                 isSignedIn={true}
                 theme="dark"
             />

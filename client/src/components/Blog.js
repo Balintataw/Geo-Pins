@@ -1,9 +1,30 @@
-import React from "react";
+import React, { useContext } from "react";
 import { withStyles } from "@material-ui/core/styles";
-// import { Paper } from "@material-ui/core";
+import { Paper } from "@material-ui/core";
+
+import NoContent from './Pin/NoContent';
+import CreatePin from  './Pin/CreatePin';
+
+import Context from '../store/context';
 
 const Blog = ({ classes }) => {
-  return <div>Blog</div>;
+    const { state } = useContext(Context);
+    const { draft } = state;
+
+    let BlogContent;
+    if (!draft) {
+        // nocontent component
+        BlogContent = NoContent;
+    } else if (draft) {
+        // creating a pin and content
+        BlogContent = CreatePin;
+    }
+
+    return (
+        <Paper className={classes.root}>
+            <BlogContent />
+        </Paper>
+    )
 };
 
 const styles = {

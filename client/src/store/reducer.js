@@ -1,4 +1,10 @@
-import { LOGIN_USER, IS_LOGGED_IN } from './actionTypes';
+import { 
+    LOGIN_USER, 
+    IS_LOGGED_IN, 
+    SIGNOUT_USER, 
+    CREATE_DRAFT, 
+    UPDATE_DRAFT_LOCATION 
+} from './actionTypes';
 
 export default function reducer(state, action) {
     switch(action.type) {
@@ -6,6 +12,28 @@ export default function reducer(state, action) {
             return { ...state, currentUser: action.payload }
         case IS_LOGGED_IN:
             return { ...state, isAuth: action.payload }
+        case SIGNOUT_USER:
+            return {
+                ...state, 
+                currentUser: null,
+                isAuth: false
+            }
+        case CREATE_DRAFT:
+            return {
+                ...state,
+                draft: {
+                    latitude: 0,
+                    longitude: 0
+                }
+            }
+        case UPDATE_DRAFT_LOCATION:
+            return {
+                ...state,
+                draft: {
+                    latitude: action.payload.latitude,
+                    longitude: action.payload.longitude
+                }
+            }
         default:
             return state;
     }
