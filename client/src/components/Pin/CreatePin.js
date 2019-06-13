@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState, useContext } from "react";
+import { GraphQLClient } from 'graphql-request';
+import axios from 'axios';
 import { withStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
@@ -8,7 +10,65 @@ import LandscapeIcon from "@material-ui/icons/LandscapeOutlined";
 import ClearIcon from "@material-ui/icons/Clear";
 import SaveIcon from "@material-ui/icons/SaveTwoTone";
 
+import { DELETE_DRAFT } from '../../store/actionTypes';
+import Context from '../../store/context';
+import { CREATE_PIN_MUTATION } from '../../graphql/mutations';
+
 const CreatePin = ({ classes }) => {
+    const { state, dispatch } = useContext(Context);
+    const [ title, setTitle ] = useState("");
+    const [ image, setImage ] = useState("");
+    const [ content, setContent ] = useState("");
+    const [ submitting, setSubmitting ] = useState(false)
+
+    const handleClearForm = () => {
+        setTitle('');
+        setImage('');
+        setContent('');
+        dispatch({ type: DELETE_DRAFT });
+    };
+
+    const handleSubmit = async event => {
+        event.preventDefault();
+        setSubmitting(true);
+        try {
+            const idToken = window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+            const client = new GraphQLClient(process.env.REACT_APP_GRAPHQL_ENDPOINT, {
+                headers: { authorization: idToken }
+            });
+            const url = await handleImageUpload();
+            const { latitude, longitude } = state.draft;
+            const variables = {
+                title,
+                image: url,
+                content,
+                latitude,
+                longitude
+            };
+            console.log("VARS", variables)
+            const { createPin } = await client.request(CREATE_PIN_MUTATION, variables)
+            console.log("CREATED PIN", {createPin})
+            handleClearForm();
+        } catch (err) {
+            setSubmitting(false)
+            throw new Error(`Error creating pin: ${err}`);
+        }
+    };
+
+    const handleImageUpload = async () => {
+        const data = new FormData();
+        data.append('file', image);
+        data.append('upload_preset', 'geopins_default');
+        data.append('cloud_name','jossendal-development')
+        data.append('public_id', 'geopins') // folder name
+        try {
+            const response = await axios.post('https://api.cloudinary.com/v1_1/jossendal-development/image/upload', data);
+            return response.data.url;
+        } catch (err) {
+            throw new Error(`Error uploading image: ${err}`)
+        }
+    };
+
     return (
         <form className={classes.form}>
             <Typography
@@ -20,11 +80,23 @@ const CreatePin = ({ classes }) => {
                 <LandscapeIcon className={classes.iconLarge} /> Pin a location
             </Typography>
             <div>
-                <TextField name="title" label="Title" placeholder="Insert Pin title" />
-                <input accept="image/*" id="image" type="file" className={classes.input} />
+                <TextField 
+                    name="title" 
+                    label="Title" 
+                    placeholder="Insert Pin title" 
+                    onChange={(e) => setTitle(e.target.value)}
+                />
+                <input 
+                    accept="image/*" 
+                    id="image" 
+                    type="file" 
+                    className={classes.input} 
+                    onChange={(e) => setImage(e.target.files[0])}
+                />
                 <label htmlFor="image">
                     <Button
                         component="span"
+                        style={{ color: image && "green" }}
                         size="small"
                         className={classes.button}
                     >
@@ -33,14 +105,32 @@ const CreatePin = ({ classes }) => {
                 </label>
             </div>
             <div className={classes.contentField}>
-                <TextField name="content" label="Content" multiline rows="6" margin="normal" fullWidth variant="outlined" />
+                <TextField 
+                    name="content" 
+                    label="Content" 
+                    multiline 
+                    rows="6" 
+                    margin="normal" 
+                    fullWidth 
+                    variant="outlined" 
+                    onChange={(e) => setContent(e.target.value)}
+                />
             </div>
             <div>
-                <Button className={classes.button} variant="contained" color="primary">
+                <Button 
+                    onClick={handleClearForm}
+                    className={classes.button} 
+                    variant="contained" 
+                    color="primary">
                     <ClearIcon className={classes.leftIcon}/> 
                     Discard
                 </Button>
-                <Button className={classes.button} variant="contained" color="secondary">
+                <Button 
+                    onClick={handleSubmit}
+                    disabled={!title.trim() || !image || !content.trim() || submitting}
+                    className={classes.button} 
+                    variant="contained" 
+                    color="secondary">
                     Submit
                     <SaveIcon className={classes.rightIcon}/> 
                 </Button>

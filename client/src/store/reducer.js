@@ -3,7 +3,8 @@ import {
     IS_LOGGED_IN, 
     SIGNOUT_USER, 
     CREATE_DRAFT, 
-    UPDATE_DRAFT_LOCATION 
+    UPDATE_DRAFT_LOCATION,
+    DELETE_DRAFT
 } from './actionTypes';
 
 export default function reducer(state, action) {
@@ -34,7 +35,12 @@ export default function reducer(state, action) {
                     longitude: action.payload.longitude
                 }
             }
+        case DELETE_DRAFT:
+            return {
+                ...state,
+                draft: null
+            }
         default:
             return state;
     }
-}
+};
