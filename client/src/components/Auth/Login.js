@@ -7,7 +7,7 @@ import Typography from "@material-ui/core/Typography";
 import { ME_QUERY } from '../../graphql/queries';
 import { LOGIN_USER, IS_LOGGED_IN } from '../../store/actionTypes';
 import Context from '../../store/context';
-
+import { BASE_URL } from '../../helpers/client';
 
 const Login = ({ classes }) => {
     const { dispatch } = useContext(Context);
@@ -15,7 +15,7 @@ const Login = ({ classes }) => {
     const onSuccess = async googleUser => {
         try {
             const idToken = googleUser.getAuthResponse().id_token;
-            const client = new GraphQLClient(process.env.REACT_APP_GRAPHQL_ENDPOINT, {
+            const client = new GraphQLClient(BASE_URL, {
                 headers: {
                     authorization: idToken
                 }

@@ -1,5 +1,4 @@
 import React, { useState, useContext } from "react";
-import { GraphQLClient } from 'graphql-request';
 import axios from 'axios';
 import { withStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
@@ -10,11 +9,13 @@ import LandscapeIcon from "@material-ui/icons/LandscapeOutlined";
 import ClearIcon from "@material-ui/icons/Clear";
 import SaveIcon from "@material-ui/icons/SaveTwoTone";
 
-import { DELETE_DRAFT } from '../../store/actionTypes';
+import { DELETE_DRAFT, CREATE_PIN } from '../../store/actionTypes';
 import Context from '../../store/context';
 import { CREATE_PIN_MUTATION } from '../../graphql/mutations';
+import { useClient } from '../../helpers/client';
 
 const CreatePin = ({ classes }) => {
+    const client = useClient();
     const { state, dispatch } = useContext(Context);
     const [ title, setTitle ] = useState("");
     const [ image, setImage ] = useState("");
@@ -32,10 +33,6 @@ const CreatePin = ({ classes }) => {
         event.preventDefault();
         setSubmitting(true);
         try {
-            const idToken = window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
-            const client = new GraphQLClient(process.env.REACT_APP_GRAPHQL_ENDPOINT, {
-                headers: { authorization: idToken }
-            });
             const url = await handleImageUpload();
             const { latitude, longitude } = state.draft;
             const variables = {
@@ -45,9 +42,8 @@ const CreatePin = ({ classes }) => {
                 latitude,
                 longitude
             };
-            console.log("VARS", variables)
             const { createPin } = await client.request(CREATE_PIN_MUTATION, variables)
-            console.log("CREATED PIN", {createPin})
+            dispatch({ type: CREATE_PIN, payload: createPin })
             handleClearForm();
         } catch (err) {
             setSubmitting(false)
@@ -59,8 +55,8 @@ const CreatePin = ({ classes }) => {
         const data = new FormData();
         data.append('file', image);
         data.append('upload_preset', 'geopins_default');
-        data.append('cloud_name','jossendal-development')
-        data.append('public_id', 'geopins') // folder name
+        data.append('cloud_name','jossendal-development');
+        data.append('folder', 'geopins'); // folder name
         try {
             const response = await axios.post('https://api.cloudinary.com/v1_1/jossendal-development/image/upload', data);
             return response.data.url;

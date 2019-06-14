@@ -7,6 +7,7 @@ import Splash from "./pages/Splash";
 import Context from './store/context';
 import reducer from './store/reducer';
 import ProtectedRoute from './routes/ProtectedRoute';
+import './fontawesome';
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import * as serviceWorker from "./serviceWorker";
