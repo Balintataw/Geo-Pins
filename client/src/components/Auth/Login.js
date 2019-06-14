@@ -7,7 +7,10 @@ import Typography from "@material-ui/core/Typography";
 import { ME_QUERY } from '../../graphql/queries';
 import { LOGIN_USER, IS_LOGGED_IN } from '../../store/actionTypes';
 import Context from '../../store/context';
-import { BASE_URL } from '../../helpers/client';
+// import { BASE_URL } from '../../helpers/client';
+const BASE_URL = process.env.NODE_ENV === ' production' ?
+    process.env.REACT_APP_GRAPHQL_ENDPOINT_PROD :
+    process.env.REACT_APP_GRAPHQL_ENDPOINT_DEV
 
 const Login = ({ classes }) => {
     console.log("BASE_URL_LOGIN", BASE_URL)
