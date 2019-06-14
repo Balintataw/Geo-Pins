@@ -3,7 +3,10 @@ import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import AccessTimeIcon from "@material-ui/icons/AccessTime";
 import FaceIcon from "@material-ui/icons/Face";
+import distanceInWordsToNow from 'date-fns/distance_in_words_to_now';
 
+import CreateComment from '../Comment/CreateComment';
+import Comments from '../Comment/Comments';
 import Context from '../../store/context';
 
 const PinContent = ({ classes }) => {
@@ -20,11 +23,14 @@ const PinContent = ({ classes }) => {
             </Typography>
             <Typography className={classes.text} variant="subtitle2" color="inherit" gutterBottom>
                 <AccessTimeIcon className={classes.icon} />
-                {createdAt}
+                {distanceInWordsToNow(+createdAt, {addSuffix: true})}
             </Typography>
             <Typography className={classes.text} variant="subtitle1" gutterBottom>
                 {content}
             </Typography>
+            {/*  pin comments  */}
+            <CreateComment />
+            <Comments comments={comments} />
         </div>
     )
 };

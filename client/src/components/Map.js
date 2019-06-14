@@ -3,9 +3,12 @@ import ReactMapGL, { NavigationControl, Marker, Popup } from 'react-map-gl';
 import { withStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
+import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Subscription } from 'react-apollo';
 
-import { CREATE_DRAFT, UPDATE_DRAFT_LOCATION, GET_PINS, SET_PIN, DELETE_PIN } from '../store/actionTypes';
+import { CREATE_DRAFT, UPDATE_DRAFT_LOCATION, GET_PINS, CREATE_PIN, SET_PIN, DELETE_PIN, CREATE_COMMENT } from '../store/actionTypes';
+import { PIN_ADDED_SUBSCRIPTION, PIN_DELETED_SUBSCRIPTION, PIN_UPDATED_SUBSCRIPTION } from '../graphql/subscriptions';
 import Blog from    './Blog';
 import PinIcon from './PinIcon';
 import Context from '../store/context';
@@ -22,6 +25,7 @@ const INITIAL_VIEWPORT = {
 
 const Map = ({ classes }) => {
     const client = useClient();
+    const mobileSize = useMediaQuery('(max-width: 650px)');
     const { state, dispatch } = useContext(Context);
     useEffect(() => {
         getPins()
@@ -33,6 +37,12 @@ const Map = ({ classes }) => {
         getUserPosition()
     }, []);
     const [ popup, setPopup ] = useState(null);
+
+    // remove popup if author deletes pin while another user is viewing it
+    useEffect(() => {
+        const pinExists = popup && state.pins.findIndex(pin => pin._id === popup._id) > -1;
+        if (!pinExists) setPopup(null);
+    }, [state.pins.length]);
 
     const getUserPosition = () => {
         if('geolocation' in navigator) {
@@ -88,9 +98,7 @@ const Map = ({ classes }) => {
     const handleDeletePin = async pin => {
         try {
             const variables = { pinId: pin._id };
-            const deletePin = await client.request(DELETE_PIN_MUTATION, variables);
-            console.log("DELETE PIN", deletePin)
-            dispatch({ type: DELETE_PIN, payload: deletePin });
+            await client.request(DELETE_PIN_MUTATION, variables);
             setPopup(null);
         } catch (error) {
             throw new Error("Error deleting pin:", error)
@@ -98,7 +106,7 @@ const Map = ({ classes }) => {
     };
 
     return (
-        <div className={classes.root}>
+        <div className={mobileSize ? classes.rootMobile: classes.root}>
             <ReactMapGL 
                 mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_PUBLIC_TOKEN}
                 width="100vw"
@@ -106,6 +114,7 @@ const Map = ({ classes }) => {
                 mapStyle="mapbox://styles/mapbox/streets-v9"
                 onViewportChange={newViewport => setViewport(newViewport)}
                 onClick={handleMapClick}
+                scrollZoom={!mobileSize}
                 { ...viewport }
             >
                 {/* controls */}
@@ -177,6 +186,31 @@ const Map = ({ classes }) => {
                     </Popup>
                 )}
             </ReactMapGL>
+            {/* Subscriptions fro creating updating and deleting pins */}
+            <Subscription
+                subscription={PIN_ADDED_SUBSCRIPTION}
+                onSubscriptionData={({ subscriptionData }) => {
+                    const { pinAdded } = subscriptionData.data;
+                    console.log("PIN ADDED", { pinAdded })
+                    dispatch({ type: CREATE_PIN, payload: pinAdded })
+                }}
+            />
+            <Subscription
+                subscription={PIN_UPDATED_SUBSCRIPTION}
+                onSubscriptionData={({ subscriptionData }) => {
+                    const { pinUpdated } = subscriptionData.data;
+                    console.log("PIN UPDATED", { pinUpdated })
+                    dispatch({ type: CREATE_COMMENT, payload: pinUpdated })
+                }}
+            />
+            <Subscription
+                subscription={PIN_DELETED_SUBSCRIPTION}
+                onSubscriptionData={({ subscriptionData }) => {
+                    const { pinDeleted } = subscriptionData.data;
+                    console.log("PIN DELETED", { pinDeleted })
+                    dispatch({ type: DELETE_PIN, payload: pinDeleted })
+                }}
+            />
             {/* Blog area for pin content*/}
             <Blog />
         </div>

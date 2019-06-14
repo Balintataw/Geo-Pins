@@ -9,6 +9,7 @@ import {
     CREATE_PIN,
     SET_PIN,
     DELETE_PIN,
+    CREATE_COMMENT,
 } from './actionTypes';
 
 export default function reducer(state, action) {
@@ -64,7 +65,7 @@ export default function reducer(state, action) {
                 draft: null
             }
         case DELETE_PIN:
-            const deletedPin = action.payload.deletePin;
+            const deletedPin = action.payload;
             const filteredPins = state.pins.filter(pin => {
                 return pin._id !== deletedPin._id
             })
@@ -82,6 +83,17 @@ export default function reducer(state, action) {
                 ...state,
                 pins: filteredPins
             };
+        case CREATE_COMMENT:
+            const updatedCurrentPin = action.payload;
+            // find and replace
+            const updatedPins = state.pins.map(pin => 
+                pin._id === updatedCurrentPin._id ? updatedCurrentPin : pin
+            )
+            return {
+                ...state,
+                pins: updatedPins,
+                currentPin: updatedCurrentPin
+            }
         default:
             return state;
     }
