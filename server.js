@@ -41,6 +41,11 @@ const server = new ApolloServer({
     }
 });
 
+server.applyMiddleware({
+    path: '/', // you should change this to whatever you want
+    app,
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
