@@ -1,6 +1,15 @@
+const path = require('path');
+const express = require('express');
+const cors = require('cors');
 const { ApolloServer } = require('apollo-server');
 const mongoose = require('mongoose');
 require('dotenv').config();
+
+const app = express();
+
+app.use(cors());
+
+app.use(express.static('public'));
 
 const typeDefs = require('./typeDefs');
 const resolvers = require('./resolvers');
@@ -30,6 +39,10 @@ const server = new ApolloServer({
         }
         return { currentUser }
     }
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
 server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {

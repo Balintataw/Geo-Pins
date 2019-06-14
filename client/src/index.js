@@ -18,7 +18,9 @@ import { WebSocketLink } from 'apollo-link-ws';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 
 const wslink = new WebSocketLink({
-    uri: 'ws://localhost:4000/graphql',
+    uri: process.env.NODE_ENV === 'production' ? 
+         process.env.REACT_APP_APOLLO_WEBSOCKET_URL_PROD :
+         process.env.REACT_APP_APOLLO_WEBSOCKET_URL_DEV,
     options: {
         reconnect: true
     }
