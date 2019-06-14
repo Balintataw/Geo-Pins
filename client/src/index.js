@@ -17,6 +17,7 @@ import { ApolloClient } from 'apollo-client';
 import { WebSocketLink } from 'apollo-link-ws';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 
+console.log("ENV", process.env.NODE_ENV)
 const wslink = new WebSocketLink({
     uri: process.env.NODE_ENV === 'production' ? 
          process.env.REACT_APP_APOLLO_WEBSOCKET_URL_PROD :

@@ -1,10 +1,12 @@
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
-const { ApolloServer } = require('apollo-server');
+// const { ApolloServer } = require('apollo-server');
+const { ApolloServer } = require('apollo-server-express');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
+const PORT = process.env.PORT || 4000;
 const app = express();
 
 app.use(cors());
@@ -42,14 +44,19 @@ const server = new ApolloServer({
 });
 
 server.applyMiddleware({
-    path: '/', // you should change this to whatever you want
+    path: '/graphql',
     app,
 });
+
+// app.use(server)
 
 app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
-server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
-    console.log(`Server listening on ${url}`);
+app.listen(PORT, () => {
+    console.log(`Apollo server listening on http://localhost:${PORT}/graphql`);
 });
+// server.listen({ port: PORT }).then(({ url }) => {
+//     console.log(`Server listening on ${url}`);
+// });
