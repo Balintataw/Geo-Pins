@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { GraphQLClient } from 'graphql-request';
 
-export const BASE_URL = process.env.NODE_ENV === ' production' ?
+export const BASE_URL = process.env.NODE_ENV === 'production' ?
     process.env.REACT_APP_GRAPHQL_ENDPOINT_PROD :
     process.env.REACT_APP_GRAPHQL_ENDPOINT_DEV
 
