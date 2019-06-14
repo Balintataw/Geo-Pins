@@ -1,5 +1,6 @@
 const path = require('path');
 const express = require('express');
+const { createServer } = require('http');
 const cors = require('cors');
 // const { ApolloServer } = require('apollo-server');
 const { ApolloServer } = require('apollo-server-express');
@@ -44,7 +45,7 @@ const server = new ApolloServer({
 });
 
 server.applyMiddleware({
-    path: '/graphql',
+    // path: '/graphql',
     app,
 });
 
@@ -54,9 +55,16 @@ app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => {
-    console.log(`Apollo server listening on http://localhost:${PORT}/graphql`);
-});
+const httpServer = createServer(app);
+server.installSubscriptionHandlers(httpServer);
+
+httpServer.listen({ port: PORT }, () =>{
+    console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`)
+    console.log(`🚀 Subscriptions ready at ws://localhost:${PORT}${server.subscriptionsPath}`)
+})
+// app.listen(PORT, () => {
+//     console.log(`Apollo server listening on http://localhost:${PORT}/graphql`);
+// });
 // server.listen({ port: PORT }).then(({ url }) => {
 //     console.log(`Server listening on ${url}`);
 // });
