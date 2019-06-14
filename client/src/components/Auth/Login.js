@@ -29,7 +29,7 @@ const Login = ({ classes }) => {
     };
 
     const onFailure = err => {
-        console.error(`Error logging in: ${err}`);
+        console.error(`Error logging in: ${err.message}`);
             dispatch({ type: IS_LOGGED_IN, payload: false });
     };
 
