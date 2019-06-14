@@ -10,6 +10,7 @@ import Context from '../../store/context';
 import { BASE_URL } from '../../helpers/client';
 
 const Login = ({ classes }) => {
+    console.log("BASE_URL_LOGIN", BASE_URL)
     const { dispatch } = useContext(Context);
 
     const onSuccess = async googleUser => {
