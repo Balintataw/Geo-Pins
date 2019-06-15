@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 const PinSchema = new mongoose.Schema({
     title: String,
     content: String,
-    image: String,
+    image: { 
+        imageURL: String,
+        publicId: String
+    },
     latitude: Number,
     longitude: Number,
     author: { type: mongoose.Schema.ObjectId, ref: 'User' },

@@ -10,7 +10,6 @@ import Context from '../../store/context';
 import { BASE_URL } from '../../helpers/client';
 
 const Login = ({ classes }) => {
-    console.log("BASE_URL_LOGIN", BASE_URL)
     const { dispatch } = useContext(Context);
 
     const onSuccess = async googleUser => {
@@ -31,7 +30,7 @@ const Login = ({ classes }) => {
 
     const onFailure = err => {
         console.error(`Error logging in: ${JSON.stringify(err)}`);
-            dispatch({ type: IS_LOGGED_IN, payload: false });
+        dispatch({ type: IS_LOGGED_IN, payload: false });
     };
 
     return (

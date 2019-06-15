@@ -1,8 +1,11 @@
 export const CREATE_PIN_MUTATION = `
-    mutation($title: String!, $image: String!, $content: String!, $latitude: Float!, $longitude: Float!) {
+    mutation($title: String!, $imageURL: String!, $publicId: String!, $content: String!, $latitude: Float!, $longitude: Float!) {
         createPin(input: {
             title: $title,
-            image: $image,
+            image: {
+                imageURL: $imageURL,
+                publicId: $publicId
+            },
             content: $content,
             latitude: $latitude,
             longitude: $longitude
@@ -10,7 +13,10 @@ export const CREATE_PIN_MUTATION = `
             _id
             createdAt
             title
-            image
+            image {
+                imageURL
+                publicId
+            }
             content
             latitude
             longitude
@@ -39,7 +45,9 @@ export const CREATE_COMMENT_MUTATION = `
             createdAt
             title
             content
-            image
+            image {
+                imageURL
+            }
             latitude
             longitude
             author {

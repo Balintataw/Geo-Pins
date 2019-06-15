@@ -6,6 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import { unstable_useMediaQuery as useMediaQuery } from '@material-ui/core/useMediaQuery'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Subscription } from 'react-apollo';
+import sha1 from 'sha1';
 
 import { CREATE_DRAFT, UPDATE_DRAFT_LOCATION, GET_PINS, CREATE_PIN, SET_PIN, DELETE_PIN, CREATE_COMMENT } from '../store/actionTypes';
 import { PIN_ADDED_SUBSCRIPTION, PIN_DELETED_SUBSCRIPTION, PIN_UPDATED_SUBSCRIPTION } from '../graphql/subscriptions';
@@ -16,6 +17,7 @@ import { useClient } from '../helpers/client';
 import { GET_PINS_QUERY } from '../graphql/queries';
 import { DELETE_PIN_MUTATION } from '../graphql/mutations';
 import { differenceInHours } from "date-fns";
+import axios from "axios";
 
 const INITIAL_VIEWPORT = {
     latitude: 36.1577,
@@ -98,10 +100,25 @@ const Map = ({ classes }) => {
     const handleDeletePin = async pin => {
         try {
             const variables = { pinId: pin._id };
+            await handleImageDelete(pin)
             await client.request(DELETE_PIN_MUTATION, variables);
             setPopup(null);
         } catch (error) {
             throw new Error("Error deleting pin:", error)
+        }
+    };
+
+    const handleImageDelete = async (pin) => {
+        try {
+            const UNIXtimestamp = Date.now();
+            const signaturePayload = `public_id=${pin.image.publicId}&timestamp=${UNIXtimestamp}`;
+            const signature = sha1(signaturePayload + process.env.REACT_APP_CLOUDINARY_API_SECRET);
+            const deleteUrl = `https://api.cloudinary.com/v1_1/jossendal-development/image/destroy?public_id=${pin.image.publicId}&api_key=${process.env.REACT_APP_CLOUDINARY_API_KEY}&timestamp=${UNIXtimestamp}&signature=${signature}`;
+
+            const deletedImage = await axios.post(deleteUrl);
+            if (deletedImage.data.result !== 'ok') throw new Error('Delete image failed', deletedImage)
+        } catch (err) {
+            throw new Error("ERROR: delete image failed: ", err);
         }
     };
 
@@ -170,7 +187,7 @@ const Map = ({ classes }) => {
                     >
                         <img
                             className={classes.popupImage}
-                            src={popup.image}
+                            src={popup.image.imageURL}
                             alt={popup.title}
                         />
                         <div className={classes.popupTab}>

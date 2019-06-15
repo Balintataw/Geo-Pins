@@ -6,7 +6,10 @@ export const PIN_ADDED_SUBSCRIPTION = gql`
       _id
       createdAt
       title
-      image
+      image {
+        imageURL
+        publicId
+      }
       content
       latitude
       longitude
@@ -35,7 +38,10 @@ export const PIN_UPDATED_SUBSCRIPTION = gql`
       createdAt
       title
       content
-      image
+      image {
+        imageURL
+        publicId
+      }
       latitude
       longitude
       author {

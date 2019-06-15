@@ -35,11 +35,12 @@ const CreatePin = ({ classes }) => {
         event.preventDefault();
         setSubmitting(true);
         try {
-            const url = await handleImageUpload();
+            const { url, public_id } = await handleImageUpload();
             const { latitude, longitude } = state.draft;
             const variables = {
                 title,
-                image: url,
+                imageURL: url,
+                publicId: public_id,
                 content,
                 latitude,
                 longitude
@@ -60,7 +61,7 @@ const CreatePin = ({ classes }) => {
         data.append('folder', 'geopins'); // folder name
         try {
             const response = await axios.post('https://api.cloudinary.com/v1_1/jossendal-development/image/upload', data);
-            return response.data.url;
+            return response.data;
         } catch (err) {
             throw new Error(`Error uploading image: ${err}`)
         }

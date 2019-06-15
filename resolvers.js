@@ -23,12 +23,15 @@ module.exports = {
     },
     Mutation: {
         createPin: authenticated(async (root, args, ctx) => {
+            console.log("ARGS", args)
             const newPin = await new Pin({
                 ...args.input,
                 author: ctx.currentUser._id
             }).save();
+            console.log("NEW PIN", newPin)
             const pinAdded = await Pin.populate(newPin, 'author');
             pubsub.publish(PIN_ADDED, { pinAdded });
+            console.log("PIN PUBLISHED", pinAdded)
             return pinAdded;
         }),
         deletePin: authenticated(async (root, args, ctx) => {

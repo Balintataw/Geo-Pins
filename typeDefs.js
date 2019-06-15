@@ -8,12 +8,19 @@ module.exports = gql`
         picture: String
     }
 
+    type Image {
+        _id: ID
+        createdAt: String
+        imageURL: String
+        publicId: String
+    }
+
     type Pin {
         _id: ID
         createdAt: String
         title: String
         content: String
-        image: String
+        image: Image
         latitude: Float
         longitude: Float
         author: User
@@ -26,9 +33,14 @@ module.exports = gql`
         author: User
     }
 
+    input CreateImageInput {
+        imageURL: String
+        publicId: String
+    }
+
     input CreatePinInput {
         title: String
-        image: String
+        image: CreateImageInput
         content: String
         latitude: Float
         longitude: Float
