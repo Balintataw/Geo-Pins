@@ -3,19 +3,20 @@ import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 import purple from "@material-ui/core/colors/purple";
 import green from "@material-ui/core/colors/green";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import { blueGrey } from "@material-ui/core/colors";
 
 // A theme with custom primary and secondary color.
 // It's optional.
 const theme = createMuiTheme({
   palette: {
     primary: {
-      light: purple[300],
-      main: purple[500],
-      dark: purple[700]
+      light: '#e57373',
+      main: '#c62828',
+      dark: '#b71c1c'
     },
     secondary: {
       light: green[300],
-      main: green[500],
+      main: blueGrey[500],
       dark: green[700]
     }
   },

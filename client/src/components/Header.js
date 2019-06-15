@@ -23,7 +23,7 @@ const Header = ({ classes }) => {
                         <Typography 
                             className={mobileSize ? classes.mobile : ''}
                             component="h1" variant="h6" color="inherit" noWrap>
-                            GeoPins
+                            GeoVents
                         </Typography>
                     </div>
                     {currentUser && (
@@ -58,7 +58,7 @@ const styles = theme => ({
   },
   icon: {
     marginRight: theme.spacing.unit,
-    color: "green",
+    color: '#FFF',
     fontSize: 45
   },
   mobile: {
