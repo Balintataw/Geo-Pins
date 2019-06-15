@@ -5,8 +5,6 @@ export const BASE_URL = process.env.NODE_ENV === 'production' ?
     process.env.REACT_APP_GRAPHQL_ENDPOINT_PROD :
     process.env.REACT_APP_GRAPHQL_ENDPOINT_DEV
 
-    console.log("BASE_URL_IN_CLIENT_HELPER", BASE_URL)
-
 export const useClient = () => {
     const [ idToken, setIdToken ] = useState("");
     useEffect(() => {

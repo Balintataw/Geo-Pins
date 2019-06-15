@@ -41,7 +41,8 @@ const server = new ApolloServer({
             console.error(`Unable to authenticate with token ${authToken}`);
         }
         return { currentUser }
-    }
+    },
+    introspection: true
 });
 
 server.applyMiddleware({
